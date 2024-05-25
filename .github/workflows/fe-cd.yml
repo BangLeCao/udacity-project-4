@@ -98,7 +98,7 @@ jobs:
       run:
         aws eks update-kubeconfig --name cluster --region us-east-1
 
-    -name: Check current kubectl context
+    - name: Check current kubectl context
       run:
         kubectl config current-context   
 
