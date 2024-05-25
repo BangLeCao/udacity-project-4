@@ -35,8 +35,8 @@ jobs:
 
     # Run the npm run lint command  
     - name: Checkout Run Lint
-      run: |
-        cd starter/frontend
+      working-directory: starter/frontend
+      run:
         npm run lint
 
   # Runs a test job that fails if the test suite doesn't pass
@@ -64,8 +64,8 @@ jobs:
   
     # Run the npm run test command
     - name: Test
-      run: |
-        cd starter/frontend
+      working-directory: starter/frontend
+      run:
         npm test
 
   # Runs a build job only if the lint and test jobs pass and successfully builds the application
@@ -90,7 +90,7 @@ jobs:
 
     # Build and run docker Image
     - name: Build and run docker Image
+      working-directory: starter/frontend
       run: |
-        cd starter/frontend
         docker build --build-arg=REACT_APP_MOVIE_API_URL=http://localhost:5000 --tag=frontend-app:latest .
         docker run --name frontend-app -p 3000:3000 -d frontend-app
