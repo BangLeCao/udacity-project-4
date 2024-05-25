@@ -30,9 +30,9 @@ jobs:
       working-directory: starter/frontend
       run: npm ci
 
-    - name: Checkout Run Lint
+    - name: Run Lint
       working-directory: starter/frontend
-      run: FAIL_LINT=true npm run lint
+      run: npm run lint
 
   test-job:
     runs-on: ubuntu-latest
@@ -54,7 +54,7 @@ jobs:
   
     - name: Test
       working-directory: starter/frontend
-      run: npm run test
+      run: FAIL_TEST=true CI=true npm run test
 
   # Runs a build job only if the lint and test jobs pass and successfully builds the application
   build-job:
