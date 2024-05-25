@@ -1,0 +1,76 @@
+name: Frontend - CI
+
+on:
+  # Is able to be run on-demand (i.e. manually without needing to push code)
+  workflow_dispatch:
+  # Runs on pull_requests against the main branch,only when code in the frontend application changes
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  # uns a linting job that fails if the code doesn't adhere to eslint rules
+  linting-job:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check the Repository
+      uses: actions/checkout@v3
+
+    - name: Use Node.js 18
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        cache: 'npm'
+        cache-dependency-path: starter/frontend/package-lock.json
+
+    - name: Install Dependencies
+      working-directory: starter/frontend
+      run: npm ci
+
+    - name: Checkout Run Lint
+      run: cd starter/frontend && npm run lint
+
+  # Runs a test job that fails if the test suite doesn't pass
+  test-job:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Check the Repository
+      uses: actions/checkout@v3
+
+    - name: Use Node.js 18
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        cache: 'npm'
+        cache-dependency-path: starter/frontend/package-lock.json
+
+    - name: Install Dependencies
+      working-directory: starter/frontend
+      run: npm ci
+  
+    - name: Test
+      run: cd starter/frontend && npm run test
+
+  # Runs a build job only if the lint and test jobs pass and successfully builds the application    
+  build-job:
+    needs: [linting-job, test-job]
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Check the Repository
+      uses: actions/checkout@v3
+    
+    - name: Use Node.js 18
+      uses: actions/setup-node@v3
+      with:
+        node-version: 18
+        cache: 'npm'
+        cache-dependency-path: starter/frontend/package-lock.json
+
+    - name: Build and Run Docker Image
+      run: |
+        cd starter/frontend
+        docker build --build-arg=REACT_APP_MOVIE_API_URL=http://localhost:5000 --tag=mp-frontend:latest .
+        docker run --name mp-frontend -p 3000:3000 -d mp-frontend
