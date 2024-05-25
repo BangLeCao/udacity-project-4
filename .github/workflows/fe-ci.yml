@@ -14,20 +14,26 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
+    # Checkout code
     - name: Check the Repository
       uses: actions/checkout@v3
 
+    # Setup NodeJS
+    # Perform a cache action to restore cache before dependency install
     - name: Use Node.js 18
       uses: actions/setup-node@v3
       with:
         node-version: 18
+        # Perform a cache action to restore cache before dependency install
         cache: 'npm'
         cache-dependency-path: starter/frontend/package-lock.json
 
+    # Install dependencies
     - name: Install Dependencies
       working-directory: starter/frontend
       run: npm ci
 
+    # Run the npm run lint command  
     - name: Checkout Run Lint
       run: |
         cd starter/frontend
@@ -37,21 +43,26 @@ jobs:
   test-job:
     runs-on: ubuntu-latest
 
+    # Checkout code
     steps:
     - name: Check the Repository
       uses: actions/checkout@v3
 
+    # Setup NodeJS
     - name: Use Node.js 18
       uses: actions/setup-node@v3
       with:
         node-version: 18
+        # Perform a cache action to restore cache before dependency install
         cache: 'npm'
         cache-dependency-path: starter/frontend/package-lock.json
 
+    # Install dependencies
     - name: Install Dependencies
       working-directory: starter/frontend
       run: npm ci
   
+    # Run the npm run test command
     - name: Test
       run: |
         cd starter/frontend
@@ -59,21 +70,26 @@ jobs:
 
   # Runs a build job only if the lint and test jobs pass and successfully builds the application
   build-job:
+    # This job should only run after the first 2 succeed
     needs: [linting-job, test-job]
     runs-on: ubuntu-latest
     
     steps:
+    # Checkout code
     - name: Check the Repository
       uses: actions/checkout@v3
     
+    # Setup NodeJS
     - name: Use Node.js 18
       uses: actions/setup-node@v3
       with:
         node-version: 18
+        # Perform a cache action to restore cache before dependency install
         cache: 'npm'
         cache-dependency-path: starter/frontend/package-lock.json
 
-    - name: Build and Run Docker Image
+    # Build and run docker Image
+    - name: Build and run docker Image
       run: |
         cd starter/frontend
         docker build --build-arg=REACT_APP_MOVIE_API_URL=http://localhost:5000 --tag=frontend-app:latest .
