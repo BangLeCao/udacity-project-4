@@ -36,7 +36,7 @@ jobs:
     # Run the npm run lint command  
     - name: Checkout Run Lint
       working-directory: starter/frontend
-      run: FAIL_LINT=true npm run lint
+      run: npm run lint
 
   # Runs a test job that fails if the test suite doesn't pass
   test-job:
