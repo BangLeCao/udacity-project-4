@@ -14,7 +14,6 @@ on:
 jobs:
   linting-job:
     runs-on: ubuntu-latest
-    environment: Devlopmnet Environment
 
     steps:
     - name: Check the Repository
@@ -55,7 +54,7 @@ jobs:
         pip install pipenv
         pip install flake8
 
-    - name: Test
+    - name: Run Test
       working-directory: starter/backend
       run: |
         pipenv install pytest
@@ -95,8 +94,7 @@ jobs:
         docker push 099570324592.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG
 
     - name: Update Kubeconfig
-      run:
-        aws eks update-kubeconfig --name cluster --region us-east-1
+      run: aws eks update-kubeconfig --name cluster --region us-east-1
 
     - name: Deploy Docker Image to Amazon EKS
       working-directory: starter/backend/k8s

@@ -65,8 +65,7 @@ jobs:
     # Run the npm run test command
     - name: Test
       working-directory: starter/frontend
-      run:
-        npm test
+      run: npm run test
 
   # Runs a build job only if the lint and test jobs pass and successfully builds the application
   build-job:
