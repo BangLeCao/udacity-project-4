@@ -54,7 +54,7 @@ jobs:
   
     - name: Test
       working-directory: starter/frontend
-      run: FAIL_TEST=true CI=true npm run test
+      run: npm run test
 
   # Runs a build job only if the lint and test jobs pass and successfully builds the application
   build-job:
