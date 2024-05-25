@@ -12,7 +12,6 @@ jobs:
   # Runs a linting job that fails if the code doesn't adhere to eslint rules
   linting-job:
     runs-on: ubuntu-latest
-    environment: Devlopmnet Environment
 
     steps:
     - name: Check the Repository
@@ -56,8 +55,8 @@ jobs:
     - name: Test
       run: cd starter/backend && pipenv install pytest && pipenv run test
 
-      
-  Build:
+  # Runs a build job only if the lint and test jobs pass and successfully builds the application    
+  build-job:
     needs: [linting-job, test-job]
     runs-on: ubuntu-latest
     
@@ -68,5 +67,4 @@ jobs:
     - name: Build Docker Image
       run: |
         cd starter/backend
-        docker build --tag mp-backend:latest .
-
+        docker build --tag backend-app:latest .        

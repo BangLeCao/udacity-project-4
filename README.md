@@ -306,9 +306,9 @@ To build the frontend application for a production deployment, they use the foll
 # Build the image
 # NOTE: Make sure the image is built with the URL of the backend system.
 # The URL below would be the default backend URL when running locally
-docker build --build-arg=REACT_APP_MOVIE_API_URL=http://localhost:5000 --tag=mp-frontend:latest .
+docker build --build-arg=REACT_APP_MOVIE_API_URL=http://localhost:5000 --tag=frontend-app:latest .
 
-docker run --name mp-frontend -p 3000:3000 -d mp-frontend]
+docker run --name frontend-app -p 3000:3000 -d frontend-app]
 
 # Open the browser to localhost:3000 and you should see the list of movies,
 # provided the backend is already running and available on localhost:5000
