@@ -1,4 +1,4 @@
-name: Backend Continuous Integration
+name: Backend - CI
 
 on:
   # Is able to be run on-demand (i.e. manually without needing to push code)
