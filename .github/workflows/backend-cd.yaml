@@ -1,4 +1,4 @@
-name: Frontend - CD
+name: Backend Continuous Deployment
 
 on:
   # Is able to be run on-demand (i.e. manually without needing to push code)
@@ -9,7 +9,7 @@ on:
       - main
     # Only when code in the frontend application changes  
     paths:
-      - starter/frontend/**  
+      - starter/backend/**
 
 jobs:
   linting-job:
@@ -20,19 +20,21 @@ jobs:
     - name: Check the Repository
       uses: actions/checkout@v3
 
-    - name: Use Node.js 18
-      uses: actions/setup-node@v3
+    - name: Setup Python
+      uses: actions/setup-python@v4
       with:
-        node-version: 18
-        cache: 'npm'
-        cache-dependency-path: starter/frontend/package-lock.json
+        python-version: "3.10"
 
-    - name: Install Dependencies
-      working-directory: starter/frontend
-      run: npm ci
+    - name: Install dependencies
+      working-directory: starter/backend 
+      run: |
+        python -m pip install --upgrade pip
+        pip install pipenv
+        pip install flake8
 
     - name: Checkout Run Lint
-      run: cd starter/frontend && npm run lint
+      working-directory: starter/backend
+      run: pipenv run lint
 
   test-job:
     runs-on: ubuntu-latest
@@ -41,21 +43,25 @@ jobs:
     - name: Check the Repository
       uses: actions/checkout@v3
 
-    - name: Use Node.js 18
-      uses: actions/setup-node@v3
+    - name: Use Python 3
+      uses:  actions/setup-python@v4
       with:
-        node-version: 18
-        cache: 'npm'
-        cache-dependency-path: starter/frontend/package-lock.json
-        
-    - name: Install Dependencies
-      working-directory: starter/frontend
-      run: npm ci
-  
-    - name: Test
-      run: cd starter/frontend && npm run test
+        python-version: "3.10"
 
-  # Runs a build job only if the lint and test jobs pass and successfully builds the application
+    - name: Install Dependencies
+      working-directory: starter/backend
+      run: |
+        python -m pip install --upgrade pip
+        pip install pipenv
+        pip install flake8
+
+    - name: Test
+      working-directory: starter/backend
+      run: |
+        pipenv install pytest
+        pipenv run test
+
+      
   build-job:
     needs: [linting-job, test-job]
     runs-on: ubuntu-latest
@@ -64,18 +70,11 @@ jobs:
 
     env:
       IMAGE_TAG: latest
-      REPO_NAME: frontend  
+      REPO_NAME: backend
     
     steps:
     - name: Check the Repository
       uses: actions/checkout@v3
-    
-    - name: Use Node.js 18
-      uses: actions/setup-node@v3
-      with:
-        node-version: 18
-        cache: 'npm'
-        cache-dependency-path: starter/frontend/package-lock.json
 
     - name: Configure AWS Credentials
       uses: aws-actions/configure-aws-credentials@v2
@@ -84,23 +83,23 @@ jobs:
         aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
         aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
         aws-region: us-east-1
-  
-    - name: Login to Amazon 
+        
+    - name: Login to Amazon
       id: login-ecr
       uses: aws-actions/amazon-ecr-login@v2
 
     - name: Build and Push Docker Image
-      working-directory: starter/frontend
+      working-directory: starter/backend
       run: |
-        docker build --build-arg=REACT_APP_MOVIE_API_URL=http://localhost:5000 --tag 099570324592.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG .
+        docker build --tag 099570324592.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG .
         docker push 099570324592.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG
-    
-    - name: Configure Kubeconfig
+
+    - name: Update Kubeconfig
       run:
         aws eks update-kubeconfig --name cluster --region us-east-1
 
     - name: Deploy Docker Image to Amazon EKS
-      working-directory: starter/frontend/k8s
+      working-directory: starter/backend/k8s
       run: |
-          kustomize edit set image frontend=099570324592.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG
-          kustomize build | kubectl apply -f -
+        kustomize edit set image backend=099570324592.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG
+        kustomize build | kubectl apply -f -
