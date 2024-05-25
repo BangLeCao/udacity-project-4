@@ -76,5 +76,5 @@ jobs:
     - name: Build and Run Docker Image
       run: |
         cd starter/frontend
-        docker build --build-arg=REACT_APP_MOVIE_API_URL=http://localhost:3000 --tag=frontend-app:latest .
+        docker build --build-arg=REACT_APP_MOVIE_API_URL=http://localhost:5000 --tag=frontend-app:latest .
         docker run --name frontend-app -p 3000:3000 -d frontend-app
