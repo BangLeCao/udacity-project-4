@@ -9,7 +9,7 @@ on:
       - main
 
 jobs:
-  # uns a linting job that fails if the code doesn't adhere to eslint rules
+  # Runs a linting job that fails if the code doesn't adhere to eslint rules
   linting-job:
     runs-on: ubuntu-latest
 
