@@ -96,12 +96,16 @@ jobs:
     
     - name: Configure Kubeconfig
       run:
-       aws eks update-kubeconfig --name cluster --region us-east-1
+        aws eks update-kubeconfig --name cluster --region us-east-1
+
+    -name: Check current kubectl context
+      run:
+        kubectl config current-context   
 
     - name: Check kubectl version    
       run:
         kubectl version
-        
+
     - name: Deploy Docker Image to Amazon EKS
       working-directory: starter/frontend/k8s
       env:
