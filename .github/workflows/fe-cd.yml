@@ -59,6 +59,8 @@ jobs:
   build-job:
     needs: [linting-job, test-job]
     runs-on: ubuntu-latest
+    environment:
+      name: DEV
     
     steps:
     - name: Check the Repository
