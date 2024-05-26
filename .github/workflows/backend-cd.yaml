@@ -68,7 +68,6 @@ jobs:
       name: DEV
 
     env:
-      IMAGE_TAG: latest
       REPO_NAME: backend
     
     steps:
@@ -90,8 +89,8 @@ jobs:
     - name: Build and Push Docker Image
       working-directory: starter/backend
       run: |
-        docker build --tag 099570324592.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG .
-        docker push 099570324592.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG
+        docker build --tag 099570324592.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:${GITHUB_SHA::7} .
+        docker push 099570324592.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:${GITHUB_SHA::7}
 
     - name: Update Kubeconfig
       run: aws eks update-kubeconfig --name cluster --region us-east-1
@@ -99,5 +98,5 @@ jobs:
     - name: Deploy Docker Image to Amazon EKS
       working-directory: starter/backend/k8s
       run: |
-        kustomize edit set image backend=099570324592.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:$IMAGE_TAG
+        kustomize edit set image backend=099570324592.dkr.ecr.us-east-1.amazonaws.com/$REPO_NAME:${GITHUB_SHA::7}
         kustomize build | kubectl apply -f -
